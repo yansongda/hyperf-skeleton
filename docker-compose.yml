@@ -1,11 +1,11 @@
 version: '3.4'
 services:
-    project:
+    yansongda:
         image: registry.cn-shenzhen.aliyuncs.com/yansongda/skeleton:hyperf-7.4
-        container_name: project
+        container_name: yansongda
         restart: always
         networks:
-            - project
+            - yansongda
         ports:
             - "8080:8080"
         volumes:
@@ -17,7 +17,7 @@ services:
 #            MYSQL_ROOT_PASSWORD: root
 #            MYSQL_DATABASE: project
 #        networks:
-#            - project
+#            - yansongda
 #        expose:
 #            - "3306"
 #        ports:
@@ -27,7 +27,7 @@ services:
 #        container_name: redis
 #        command: ["redis-server", "--requirepass", "123abc"]
 #        networks:
-#            - project
+#            - yansongda
 #        expose:
 #            - "6379"
 #        ports:
@@ -36,7 +36,7 @@ services:
 #        image: rabbitmq:management
 #        container_name: rabbitmq
 #        networks:
-#            - project
+#            - yansongda
 #        expose:
 #            - "5672"
 #            - "15672"
@@ -46,4 +46,4 @@ services:
 
 
 networks:
-    project:
+    yansongda:
