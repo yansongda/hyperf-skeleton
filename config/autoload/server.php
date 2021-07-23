@@ -28,8 +28,8 @@ return [
         'max_coroutine' => 100000,
         'open_http2_protocol' => true,
         // 'max_request' => 100000,
-        'buffer_input_size' => 2 * 1024 * 1024,
-        'buffer_output_size' => 2 * 1024 * 1024,
+        'input_buffer_size' => 2 * 1024 * 1024,
+        'output_buffer_size' => 2 * 1024 * 1024,
         'socket_buffer_size' => 2 * 1024 * 1024,
     ],
     'callbacks' => [
