@@ -10,40 +10,6 @@ services:
             - "8080:8080"
         volumes:
             - ./:/www
-#    mysql:
-#        image: mysql:5
-#        container_name: mysql
-#        environment:
-#            MYSQL_ROOT_PASSWORD: root
-#            MYSQL_DATABASE: project
-#        networks:
-#            - yansongda
-#        expose:
-#            - "3306"
-#        ports:
-#            - "3306:3306"
-#    redis:
-#        image: redis:4
-#        container_name: redis
-#        command: ["redis-server", "--requirepass", "123abc"]
-#        networks:
-#            - yansongda
-#        expose:
-#            - "6379"
-#        ports:
-#            - "6379:6379"
-#    rabbitmq:
-#        image: rabbitmq:management
-#        container_name: rabbitmq
-#        networks:
-#            - yansongda
-#        expose:
-#            - "5672"
-#            - "15672"
-#        ports:
-#            - "5672:5672"
-#            - "15672:15672"
-
 
 networks:
     yansongda:

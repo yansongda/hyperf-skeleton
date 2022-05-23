@@ -30,7 +30,15 @@ class AccessTokenService
         $info = $this->accountHttp->getUserInfo($accessToken);
 
         $data = new UserInfo();
-        $data->unserialize(json_encode($info));
+        $data->unserializeArray($info);
+
+        if (isset($info['roles']) && 'superadmin' === $info['roles']) {
+            $data->setIsSuperAdmin(true);
+        }
+
+        if (is_null($data->get('vcc_id')) || is_null($data->get('scope'))) {
+            throw new ApiException(ErrorCode::AUTH_FAILED);
+        }
 
         if (false === strpos($data->get('scope'), AccessTokenConstant::SCOPE)) {
             throw new ApiException(ErrorCode::NO_PERMISSION);

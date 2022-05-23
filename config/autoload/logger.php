@@ -13,8 +13,8 @@ return [
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => '[%datetime%] %channel%.%level_name%: %message% %context%',
-                'dateFormat' => null,
+                'format' => '%datetime%|%level_name%|%message% %context%',
+                'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
             ],
         ],
@@ -23,14 +23,14 @@ return [
         'handler' => [
             'class' => Yansongda\Supports\Logger\StdoutHandler::class,
             'constructor' => [
-                'level' => Monolog\Logger::WARNING,
+                'level' => env('APP_DEBUG', false) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
             ],
         ],
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => '[%datetime%] %channel%.%level_name%: %message% %context%',
-                'dateFormat' => null,
+                'format' => '%datetime%|%level_name%|%message% %context%',
+                'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
             ],
         ],
@@ -39,7 +39,7 @@ return [
         'handler' => [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
-                'stream' => BASE_PATH.'/runtime/logs/yansongda.log',
+                'stream' => BASE_PATH.'/runtime/logs/app.log',
                 'level' => env('APP_DEBUG', false) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
             ],
         ],
@@ -47,7 +47,7 @@ return [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
                 'format' => "[%datetime%] %channel%.%level_name%: %message% %context%\n",
-                'dateFormat' => null,
+                'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
             ],
         ],

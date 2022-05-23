@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Util;
 
-use Hyperf\Utils\Context as HContext;
+use Hyperf\Context\Context as HContext;
 
 /**
  * @method static mixed get(string $id, $default = null, $coroutineId = null)
@@ -29,12 +29,16 @@ class Context
     /**
      * @param mixed $value
      */
-    public static function append(string $key, $value): void
+    public static function append(string $key, $value, ?string $valueKey = null): void
     {
         $contextValue = HContext::getOrSet($key, []);
 
         if (is_array($contextValue)) {
-            $contextValue[] = $value;
+            if (is_null($valueKey)) {
+                $contextValue[] = $value;
+            } else {
+                $contextValue[$valueKey] = $value;
+            }
 
             HContext::set($key, $contextValue);
         }

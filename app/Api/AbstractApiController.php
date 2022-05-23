@@ -28,16 +28,11 @@ abstract class AbstractApiController
      */
     protected ResponseInterface $response;
 
-    /**
-     * Return success data to the client.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function success(?array $data = null, array $merge = []): array
     {
         $result = array_merge([
             'code' => 0,
-            'message' => 'success',
+            'message' => '操作成功',
             'request_id' => $this->request->getHeaderLine(RequestConstant::HEADER_REQUEST_ID),
         ], $merge);
 
@@ -46,5 +41,14 @@ abstract class AbstractApiController
         }
 
         return $result;
+    }
+
+    public function asterisk(?array $data = null): array
+    {
+        return array_merge([
+            'code' => 200,
+            'msg' => 'success',
+            'request_id' => $this->request->getHeaderLine(RequestConstant::HEADER_REQUEST_ID),
+        ], (array) $data);
     }
 }

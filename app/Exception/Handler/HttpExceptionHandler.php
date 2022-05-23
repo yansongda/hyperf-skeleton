@@ -13,9 +13,6 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-/**
- * @\Hyperf\ExceptionHandler\Annotation\ExceptionHandler(server="http", priority=4)
- */
 class HttpExceptionHandler extends ExceptionHandler
 {
     /**

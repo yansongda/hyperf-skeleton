@@ -10,7 +10,6 @@ use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Model;
-use Yansongda\Supports\Str;
 
 abstract class AbstractRepository
 {
@@ -38,7 +37,7 @@ abstract class AbstractRepository
         $query = $this->getQueryCondition($conditions);
 
         /** @var \App\Model\Entity\AbstractEntity $data */
-        $data = $query->latest($latest)->first($columns);
+        $data = $query->latest($latest)->take(1)->first($columns);
 
         return $data;
     }
@@ -72,14 +71,10 @@ abstract class AbstractRepository
     /**
      * 带上表关系查找所有数据.
      *
-     * !!!When using this feature, you should always include the id column and any relevant foreign key columns in the
-     * list of columns you wish to retrieve.
-     *
-     * @author Eagle Luo <eagle.luo@foxmail.com>
-     *
-     * @param array $relations 关系 eg: ['template' => ['id', 'name']]
+     * @param array  $relations 关系 eg: ['template' => ['id', 'name']]
+     * @param ?array $extra     ['limit' => 1, 'offset' => 1, 'orders' => [$field => $order]]
      */
-    public function findWithRelations(array $conditions, array $relations = [], array $columns = ['*'], ?Builder $builder = null): Collection
+    public function findWithRelations(array $conditions, array $relations = [], array $columns = ['*'], ?array $extra = null, ?Builder $builder = null): Collection
     {
         $query = $this->getQueryCondition($conditions, $builder);
 
@@ -89,6 +84,18 @@ abstract class AbstractRepository
             } else {
                 $query->with($relationName.':'.implode(',', (array) $fields));
             }
+        }
+
+        if (!is_null($extra['limit'] ?? null)) {
+            $query->limit($extra['limit']);
+        }
+
+        if (!is_null($extra['offset'] ?? null)) {
+            $query->offset($extra['offset']);
+        }
+
+        foreach ($extra['orders'] ?? [] as $field => $order) {
+            $query->orderBy($field, $order);
         }
 
         return $query->get($columns);
@@ -104,20 +111,15 @@ abstract class AbstractRepository
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array|null $sorts 排序；使用多维数组进行多个字段排序. 举例： [['id', 'desc'], ['created_at', 'asc']]
+     * @param array|null $sorts 排序；使用多维数组进行多个字段排序. 举例： ['id' => 'desc', 'created_at' => 'asc']
      */
     public function paginate(array $conditions, ?int $perPage = null, ?array $sorts = null, array $columns = ['*'], ?Builder $builder = null): LengthAwarePaginatorInterface
     {
         $query = $this->getQueryCondition($conditions, $builder);
 
         if (!is_null($sorts)) {
-            foreach ($sorts as $value) {
-                if (is_array($value)) {
-                    $query->orderBy(
-                        Str::snake(reset($value)),
-                        Str::startsWith(end($value), 'asc') ? 'asc' : 'desc'
-                    );
-                }
+            foreach ($sorts as $field => $order) {
+                $query->orderBy($field, $order);
             }
         }
 
@@ -155,12 +157,12 @@ abstract class AbstractRepository
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array $condition  需要查询更新的条件
+     * @param array $conditions 需要查询更新的条件
      * @param array $attributes 需要更新或者新增的内容
      */
-    public function updateOrCreate(array $condition, array $attributes): Model
+    public function updateOrCreate(array $conditions, array $attributes): Model
     {
-        return $this->entity->newQuery()->updateOrCreate($condition, $attributes);
+        return $this->entity->newQuery()->updateOrCreate($conditions, $attributes);
     }
 
     /**
@@ -168,13 +170,13 @@ abstract class AbstractRepository
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array $condition  需要查询更新的条件
+     * @param array $conditions 需要查询更新的条件
      * @param array $attributes 需要新增的内容
      */
-    public function firstOrCreate(array $condition, array $attributes): AbstractEntity
+    public function firstOrCreate(array $conditions, array $attributes): AbstractEntity
     {
         /** @var \App\Model\Entity\AbstractEntity $result */
-        $result = $this->entity->newQuery()->firstOrCreate($condition, $attributes);
+        $result = $this->entity->newQuery()->firstOrCreate($conditions, $attributes);
 
         return $result;
     }
@@ -184,21 +186,9 @@ abstract class AbstractRepository
      *
      * @author yansongda <me@yansongda.cn>
      */
-    public function delete(array $condition): void
+    public function delete(array $conditions): void
     {
-        $models = $this->find($condition);
-        foreach ($models as $model) {
-            $model->delete();
-        }
-    }
-
-    public function deleteByIds(int $vccId, array $ids): void
-    {
-        $data = $this->entity->newQuery()->where('vcc_id', $vccId)
-            ->whereIn('id', $ids)
-            ->get();
-
-        foreach ($data as $model) {
+        foreach ($this->find($conditions) as $model) {
             $model->delete();
         }
     }
@@ -208,14 +198,14 @@ abstract class AbstractRepository
      *
      * @author yansongda <me@yansongda.cn>
      */
-    public function directDelete(array $condition): void
+    public function directDelete(array $conditions): void
     {
-        $this->entity->newQuery()->where($condition)->delete();
+        $this->entity->newQuery()->where($conditions)->delete();
     }
 
-    public function chunk(array $conditions, int $chunk, Closure $closure): bool
+    public function chunk(array $conditions, int $chunk, Closure $closure, ?Builder $builder = null): bool
     {
-        return $this->getQueryCondition($conditions)->chunk($chunk, $closure);
+        return $this->getQueryCondition($conditions, $builder)->chunk($chunk, $closure);
     }
 
     protected function getQueryCondition(array $conditions, ?Builder $builder = null): Builder
@@ -224,7 +214,7 @@ abstract class AbstractRepository
             return $builder;
         }
 
-        $query = $this->entity->newQuery();
+        $query = $this->entity::new()->newQuery();
 
         foreach ($conditions as $field => $condition) {
             if (is_int($field)) {

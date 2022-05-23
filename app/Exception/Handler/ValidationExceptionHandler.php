@@ -15,9 +15,6 @@ use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-/**
- * @\Hyperf\ExceptionHandler\Annotation\ExceptionHandler(server="http", priority=3)
- */
 class ValidationExceptionHandler extends ExceptionHandler
 {
     /**

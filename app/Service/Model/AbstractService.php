@@ -73,6 +73,11 @@ abstract class AbstractService
         return $this->repository->findOneWithTrashed($conditions, $columns);
     }
 
+    public function chunk(array $conditions, int $chunk, Closure $closure): bool
+    {
+        return $this->repository->chunk(...func_get_args());
+    }
+
     /**
      * 批量赋值新增.
      *
@@ -176,12 +181,6 @@ abstract class AbstractService
             return;
         }
 
-        if (isset($condition['ids']) && is_array($condition['ids']) && count($condition['ids']) > 0) {
-            $this->repository->deleteByIds($condition['vcc_id'], $condition['ids']);
-
-            return;
-        }
-
         $this->repository->delete($condition);
     }
 
@@ -195,9 +194,8 @@ abstract class AbstractService
     public function paginate(array $condition, $perPage = null, ?array $sorts = null, array $columns = ['*']): array
     {
         $condition = (new \Yansongda\Supports\Collection($condition))
-            ->except(['per_page', 'current_page', 'field', 'order'])
+            ->except(['per_page', 'current_page', 'sorts'])
             ->toArray();
-
         $data = $this->repository->paginate(
             $condition,
             is_null($perPage) ? null : intval($perPage),
@@ -213,10 +211,5 @@ abstract class AbstractService
             'empty' => $data->isEmpty(),
             'results' => $data->items(),
         ];
-    }
-
-    public function chunk(array $conditions, int $chunk, Closure $closure): bool
-    {
-        return $this->repository->chunk(...func_get_args());
     }
 }

@@ -15,9 +15,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-/**
- * @\Hyperf\ExceptionHandler\Annotation\ExceptionHandler(server="http", priority=1)
- */
 class UnknownExceptionHandler extends ExceptionHandler
 {
     /**

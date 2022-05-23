@@ -5,6 +5,7 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
+        'declare_strict_types' => true,
         'class_attributes_separation' => true,
         'ordered_class_elements' => true,
         'ordered_imports' => ['sort_algorithm' => 'alpha'],
@@ -20,5 +21,6 @@ return (new PhpCsFixer\Config())
             ->exclude('runtime')
             ->exclude('vendor')
             ->exclude('test')
+            ->exclude('config')
             ->in(__DIR__)
     );

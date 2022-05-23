@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service\Http;
 
-use App\Annotation\CacheBreaker;
+use App\Annotation\CacheableBreaker;
 use App\Constants\ErrorCode;
 use App\Exception\ApiException;
+use App\Util\Http;
 use App\Util\Logger;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -21,30 +22,16 @@ class AccountHttp
 
     protected Client $client;
 
-    protected GeneralHttp $http;
-
     /**
      * Bootstrap.
      */
-    public function __construct(ConfigInterface $config, GeneralHttp $http)
+    public function __construct(ConfigInterface $config)
     {
         $this->config = $config->get('account', []);
-        $this->http = $http;
-        $this->client = $this->http->setBaseUri($this->config['url'] ?? '')
-            ->setConnectTimeout(1.0)
-            ->setTimeout(5.0)
-            ->setPoolMaxIdleTime(15)
-            ->getHttpClient();
-    }
-
-    /**
-     * getClient.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
-    public function getClient(): Client
-    {
-        return $this->client;
+        $this->client = Http::createPool([
+            'base_uri' => $this->config['url'] ?? '',
+            'timeout' => 2.0,
+        ]);
     }
 
     /**
@@ -53,7 +40,7 @@ class AccountHttp
      * @author yansongda <me@yansongda.cn>
      *
      * @Cacheable(prefix="access_token", ttl=36000)
-     * @CacheBreaker(ignoreThrowables={"App\Exception\ApiException"})
+     * @CacheableBreaker(ignoreThrowables={"App\Exception\ApiException"})
      *
      * @param string $accessToken 不带 Bearer 的
      *
@@ -69,35 +56,13 @@ class AccountHttp
             throw new ApiException(ErrorCode::AUTH_FAILED);
         }
 
+        // 坐席id、角色、部门需强转为int类型
+        $results['user_id'] = intval($results['user_id']);
+        $results['dept_id'] = intval($results['dept_id']);
+        $results['role_id'] = intval($results['role_id']);
+        $results['access_token'] = $accessToken;
+
         return $results;
-    }
-
-    /**
-     * 获取.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @Cacheable(prefix="access_token", value="root", ttl=86300)
-     * @CacheBreaker(ignoreThrowables={"App\Exception\ApiException"})
-     *
-     * @throws \App\Exception\ApiException
-     */
-    public function getRootAccessToken(): string
-    {
-        $result = $this->requestApi('POST', '/oauth2/token', [
-            'form_params' => [
-                'client_id' => $this->config['client_id'],
-                'client_secret' => $this->config['client_secret'],
-                'grant_type' => 'client_credentials',
-                'scope' => 'openid all_scopes',
-            ],
-        ]);
-
-        if (isset($result['access_token'])) {
-            return $result['access_token'];
-        }
-
-        throw new ApiException(ErrorCode::ACCOUNT_ERROR);
     }
 
     /**
@@ -106,9 +71,9 @@ class AccountHttp
      * @author yansongda <me@yansongda.cn>
      *
      * @CircuitBreaker(
-     *     maxAttempts=3,
+     *     maxAttempts=1,
      *     circuitBreakerState={"resetTimeout": 0},
-     *     fallback={"App\Fallback\HttpServiceFallback@accountRequestApi"}
+     *     fallback="App\Fallback\HttpServiceFallback@accountRequestApi"
      * )
      *
      * @throws \App\Exception\ApiException
@@ -120,7 +85,7 @@ class AccountHttp
         try {
             $startTime = microtime(true);
 
-            $response = $this->getClient()->request($method, $endpoint, $options)->getBody()->getContents();
+            $response = $this->client->request($method, $endpoint, $options)->getBody()->getContents();
 
             $result = is_array($response) ? $response : json_decode($response, true);
 

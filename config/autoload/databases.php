@@ -15,11 +15,11 @@ return [
         'prefix' => env('DB_PREFIX', ''),
         'pool' => [
             'min_connections' => 3,
-            'max_connections' => 100,
-            'connect_timeout' => 10.0,
+            'max_connections' => (int) env('DB_POOL_MAX_CONNECTIONS', 50),
+            'connect_timeout' => 1.0,
             'wait_timeout' => 3.0,
             'heartbeat' => -1,
-            'max_idle_time' => (float) env('DB_MAX_IDLE_TIME', 60),
+            'max_idle_time' => (float) env('DB_MAX_IDLE_TIME', 600),
         ],
         'commands' => [
             'gen:model' => [

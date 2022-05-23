@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 use Hyperf\Server\Event;
-use Hyperf\Server\Server;
+use Hyperf\Server\ServerInterface;
 
 return [
     'mode' => SWOOLE_PROCESS,
     'servers' => [
         [
             'name' => 'http',
-            'type' => Server::SERVER_HTTP,
+            'type' => ServerInterface::SERVER_HTTP,
             'host' => '0.0.0.0',
             'port' => 8080,
             'sock_type' => SWOOLE_SOCK_TCP,
@@ -23,7 +23,7 @@ return [
         'enable_coroutine' => true,
         'worker_num' => 2 * swoole_cpu_num(),
         'reactor_num' => 2 * swoole_cpu_num(),
-        'pid_file' => BASE_PATH.'/runtime/yansongda.pid',
+        'pid_file' => BASE_PATH.'/runtime/app.pid',
         'open_tcp_nodelay' => true,
         'max_coroutine' => 100000,
         'open_http2_protocol' => true,

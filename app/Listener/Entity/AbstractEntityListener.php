@@ -12,7 +12,7 @@ abstract class AbstractEntityListener implements ListenerInterface
 {
     public function isValid(Model $entity): bool
     {
-        return $entity instanceof Model;
+        return false;
     }
 
     /**

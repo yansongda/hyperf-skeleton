@@ -14,9 +14,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-/**
- * @\Hyperf\ExceptionHandler\Annotation\ExceptionHandler(server="http", priority=2)
- */
 class ApiExceptionHandler extends ExceptionHandler
 {
     /**
@@ -61,13 +58,7 @@ class ApiExceptionHandler extends ExceptionHandler
 
     protected function getMessage(Throwable $throwable): string
     {
-        $message = '' === $throwable->getMessage() ?
-            ErrorCode::getMessage($throwable->getCode()) : $throwable->getMessage();
-
-        if (6 == substr(strval($throwable->getCode()), 0, 1)) {
-            $message = ErrorCode::getMessage($throwable->getCode());
-        }
-
-        return $message;
+        return '' === $throwable->getMessage() ?
+        ErrorCode::getMessage($throwable->getCode()) : $throwable->getMessage();
     }
 }
