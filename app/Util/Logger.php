@@ -24,7 +24,8 @@ use Psr\Log\LoggerInterface;
 class Logger
 {
     /**
-     * __callStatic.
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function __callStatic(string $method, array $params)
     {
@@ -33,20 +34,13 @@ class Logger
         $logger = Logger::get($channel, $config);
 
         if (method_exists($logger, $method)) {
-            $params[1] = $params[1] ?? [];
-
-            $requestId = get_request_id();
-
-            if (!empty($requestId)) {
-                $params[1] = array_merge($params[1], ['request_id' => $requestId]);
-            }
-
-            $logger->{$method}($params[0], $params[1]);
+            $logger->{$method}($params[0] ?? '', $params[1] ?? []);
         }
     }
 
     /**
-     * __invoke.
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $container): LoggerInterface
     {
@@ -54,7 +48,8 @@ class Logger
     }
 
     /**
-     * get.
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function get(string $name = 'app', string $config = 'default'): LoggerInterface
     {

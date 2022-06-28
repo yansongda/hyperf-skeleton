@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use App\Constants\ErrorCode;
-use App\Constants\RequestConstant;
 use App\Exception\ApiException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,11 +20,7 @@ class InternalApiMiddleware implements MiddlewareInterface
     {
         $host = explode(':', $request->getHeaderLine('host'))[0];
 
-        // 内网域名 || k8s service
-        if ((false !== filter_var($host, FILTER_VALIDATE_IP) && (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE))) ||
-            str_contains($host, RequestConstant::DOMAIN_K8S_SERVICE) ||
-            str_contains($host, RequestConstant::DOMAIN_INTERNAL)
-        ) {
+        if (is_internal_request($host)) {
             return $handler->handle($request);
         }
 

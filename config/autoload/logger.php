@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Middleware\RequestIdLoggerProcessor;
+
 return [
     'default' => [
         'handler' => [
@@ -14,9 +16,15 @@ return [
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => "%datetime%|%level_name%|%message% %context%\n",
+                'format' => "%datetime%|%level_name%|%extra.request_id%-%extra.coroutine_id%|%message% %context% %extra%\n",
                 'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
+                'ignoreEmptyContextAndExtra' => true,
+            ],
+        ],
+        'processors' => [
+            [
+                'class' => RequestIdLoggerProcessor::class,
             ],
         ],
     ],
@@ -31,9 +39,15 @@ return [
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => "%datetime%|%level_name%|%message% %context%\n",
+                'format' => "%datetime%|%level_name%|%extra.request_id%-%extra.coroutine_id%|%message% %context% %extra%\n",
                 'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
+                'ignoreEmptyContextAndExtra' => true,
+            ],
+        ],
+        'processors' => [
+            [
+                'class' => RequestIdLoggerProcessor::class,
             ],
         ],
     ],
@@ -48,9 +62,15 @@ return [
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => "[%datetime%] %channel%.%level_name%: %message% %context%\n",
+                'format' => "[%datetime%] %channel%.%level_name%: %extra.request_id%-%extra.coroutine_id% %message% %context% %extra%\n",
                 'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
+                'ignoreEmptyContextAndExtra' => true,
+            ],
+        ],
+        'processors' => [
+            [
+                'class' => RequestIdLoggerProcessor::class,
             ],
         ],
     ],

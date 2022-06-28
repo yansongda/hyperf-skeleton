@@ -75,7 +75,6 @@ class ErrorCode extends AbstractConstants
      */
     public const FILE_STORED_ERROR = 3001;
 
-
     /**
      * 第三方 API 错误.
      */

@@ -23,6 +23,6 @@ class Demo extends AbstractEntity
     protected array $hidden = [];
 
     protected array $casts = [
-        'id' => 'integer'
+        'id' => 'integer',
     ];
 }

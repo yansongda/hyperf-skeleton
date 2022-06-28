@@ -20,7 +20,18 @@ if (!function_exists('get_request_id')) {
             return $request->getHeaderLine(RequestConstant::HEADER_REQUEST_ID);
         }
 
-        return Context::get(RequestConstant::HEADER_REQUEST_ID, '');
+        return Context::getOrSet(RequestConstant::HEADER_REQUEST_ID, uniqid());
+    }
+}
+if (!function_exists('is_internal_request')) {
+    /**
+     * 是否内网域名 或 k8s.
+     */
+    function is_internal_request(string $host): bool
+    {
+        return (false !== filter_var($host, FILTER_VALIDATE_IP) && (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)))
+            || str_contains($host, RequestConstant::DOMAIN_K8S_SERVICE)
+            || str_contains($host, RequestConstant::DOMAIN_INTERNAL);
     }
 }
 

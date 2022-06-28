@@ -15,4 +15,3 @@ class Redis
         return ApplicationContext::getContainer()->get(RedisFactory::class)->get($config);
     }
 }
-
