@@ -8,10 +8,8 @@ use App\Annotation\RecordRequestLogger;
 use App\Api\AbstractApiController;
 use Hyperf\HttpServer\Annotation\Controller;
 
-/**
- * @Controller(prefix="api/v1/demo")
- * @RecordRequestLogger()
- */
+#[Controller(prefix: 'api/v3/v1/demo')]
+#[RecordRequestLogger]
 class DemoController extends AbstractApiController
 {
 }

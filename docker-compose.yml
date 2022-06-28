@@ -1,7 +1,7 @@
 version: '3.4'
 services:
     yansongda:
-        image: registry.cn-shenzhen.aliyuncs.com/yansongda/skeleton:hyperf-7.4
+        image: registry.cn-shenzhen.aliyuncs.com/yansongda/skeleton:hyperf-8.1
         container_name: yansongda
         restart: always
         networks:

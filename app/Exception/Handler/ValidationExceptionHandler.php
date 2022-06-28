@@ -17,16 +17,9 @@ use Throwable;
 
 class ValidationExceptionHandler extends ExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected RequestInterface $request;
 
-    /**
-     * handle.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
         $this->stopPropagation();

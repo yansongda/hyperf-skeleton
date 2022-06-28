@@ -23,8 +23,8 @@ class InternalApiMiddleware implements MiddlewareInterface
 
         // 内网域名 || k8s service
         if ((false !== filter_var($host, FILTER_VALIDATE_IP) && (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE))) ||
-            false !== strpos($host, RequestConstant::DOMAIN_K8S_SERVICE) ||
-            false !== strpos($host, RequestConstant::DOMAIN_INTERNAL)
+            str_contains($host, RequestConstant::DOMAIN_K8S_SERVICE) ||
+            str_contains($host, RequestConstant::DOMAIN_INTERNAL)
         ) {
             return $handler->handle($request);
         }

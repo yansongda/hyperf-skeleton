@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Hyperf\Server\Event;
 use Hyperf\Server\ServerInterface;
+use Swoole\Constant;
 
 return [
     'mode' => SWOOLE_PROCESS,
@@ -20,17 +21,17 @@ return [
         ],
     ],
     'settings' => [
-        'enable_coroutine' => true,
-        'worker_num' => 2 * swoole_cpu_num(),
-        'reactor_num' => 2 * swoole_cpu_num(),
-        'pid_file' => BASE_PATH.'/runtime/app.pid',
-        'open_tcp_nodelay' => true,
-        'max_coroutine' => 100000,
-        'open_http2_protocol' => true,
-        // 'max_request' => 100000,
-        'input_buffer_size' => 2 * 1024 * 1024,
-        'output_buffer_size' => 2 * 1024 * 1024,
-        'socket_buffer_size' => 2 * 1024 * 1024,
+        Constant::OPTION_ENABLE_COROUTINE => true,
+        Constant::OPTION_WORKER_NUM => 2 * swoole_cpu_num(),
+        Constant::OPTION_REACTOR_NUM => 2 * swoole_cpu_num(),
+        Constant::OPTION_PID_FILE => BASE_PATH.'/runtime/app.pid',
+        Constant::OPTION_OPEN_TCP_NODELAY => true,
+        Constant::OPTION_MAX_COROUTINE => 100000,
+        Constant::OPTION_OPEN_HTTP2_PROTOCOL => true,
+        // Constant::OPTION_MAX_REQUEST => 100000,
+        Constant::OPTION_SOCKET_BUFFER_SIZE => 4 * 1024 * 1024,
+        Constant::OPTION_BUFFER_INPUT_SIZE => 2 * 1024 * 1024,
+        Constant::OPTION_PACKAGE_MAX_LENGTH => 2 * 1024 * 1024,
     ],
     'callbacks' => [
         Event::ON_WORKER_START => [Hyperf\Framework\Bootstrap\WorkerStartCallback::class, 'onWorkerStart'],

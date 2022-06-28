@@ -4,28 +4,19 @@ declare(strict_types=1);
 
 namespace App\Annotation;
 
+use Attribute;
 use Hyperf\Di\Annotation\AbstractAnnotation;
 use Hyperf\Retry\CircuitBreakerState;
 
-/**
- * @Annotation
- * @Target({"METHOD"})
- */
+#[Attribute(Attribute::TARGET_METHOD)]
 class CacheableBreaker extends AbstractAnnotation
 {
-    /**
-     * @var CircuitBreakerState|array
-     */
-    public $circuitBreakerState = [
-        'resetTimeout' => 600,
-    ];
-
-    /**
-     * @var array|string[]
-     */
-    public array $ignoreThrowables = [];
-
-    public ?string $fallback = '';
+    public function __construct(
+        public ?string $fallback = '',
+        public array $ignoreThrowables = [],
+        public CircuitBreakerState|array $circuitBreakerState = ['resetTimeout' => 600]
+    ) {
+    }
 
     public function toArray(): array
     {

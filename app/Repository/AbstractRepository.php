@@ -13,12 +13,7 @@ use Hyperf\Database\Model\Model;
 
 abstract class AbstractRepository
 {
-    /**
-     * entity.
-     *
-     * @var \App\Model\Entity\AbstractEntity
-     */
-    protected $entity;
+    protected AbstractEntity $entity;
 
     /**
      * Bootstrap.
@@ -40,13 +35,6 @@ abstract class AbstractRepository
         $data = $query->latest($latest)->take(1)->first($columns);
 
         return $data;
-    }
-
-    public function findOneWithTrashed(array $conditions, array $columns = ['*']): ?Model
-    {
-        $query = $this->getQueryCondition($conditions, $this->entity->withTrashed());
-
-        return $query->first($columns);
     }
 
     public function find(array $conditions, array $columns = ['*'], array $orders = [], ?int $offset = null, ?int $limit = null, ?Builder $builder = null): Collection
@@ -71,8 +59,7 @@ abstract class AbstractRepository
     /**
      * 带上表关系查找所有数据.
      *
-     * @param array  $relations 关系 eg: ['template' => ['id', 'name']]
-     * @param ?array $extra     ['limit' => 1, 'offset' => 1, 'orders' => [$field => $order]]
+     * @param array $relations 关系 eg: ['template' => ['id', 'name']]
      */
     public function findWithRelations(array $conditions, array $relations = [], array $columns = ['*'], ?array $extra = null, ?Builder $builder = null): Collection
     {
@@ -133,7 +120,7 @@ abstract class AbstractRepository
      */
     public function create(array $data): Model
     {
-        return $this->entity->newQuery()->create($data);
+        return $this->getEntity()->newQuery()->create($data);
     }
 
     /**
@@ -162,7 +149,7 @@ abstract class AbstractRepository
      */
     public function updateOrCreate(array $conditions, array $attributes): Model
     {
-        return $this->entity->newQuery()->updateOrCreate($conditions, $attributes);
+        return $this->getEntity()->newQuery()->updateOrCreate($conditions, $attributes);
     }
 
     /**
@@ -176,16 +163,11 @@ abstract class AbstractRepository
     public function firstOrCreate(array $conditions, array $attributes): AbstractEntity
     {
         /** @var \App\Model\Entity\AbstractEntity $result */
-        $result = $this->entity->newQuery()->firstOrCreate($conditions, $attributes);
+        $result = $this->getEntity()->newQuery()->firstOrCreate($conditions, $attributes);
 
         return $result;
     }
 
-    /**
-     * delete.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function delete(array $conditions): void
     {
         foreach ($this->find($conditions) as $model) {
@@ -193,19 +175,14 @@ abstract class AbstractRepository
         }
     }
 
-    /**
-     * 直接删除数据.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function directDelete(array $conditions): void
     {
-        $this->entity->newQuery()->where($conditions)->delete();
+        $this->getEntity()->newQuery()->where($conditions)->delete();
     }
 
-    public function chunk(array $conditions, int $chunk, Closure $closure, ?Builder $builder = null): bool
+    public function chunk(array $conditions, int $chunk, Closure $closure): bool
     {
-        return $this->getQueryCondition($conditions, $builder)->chunk($chunk, $closure);
+        return $this->getQueryCondition($conditions)->chunk($chunk, $closure);
     }
 
     protected function getQueryCondition(array $conditions, ?Builder $builder = null): Builder
@@ -214,7 +191,7 @@ abstract class AbstractRepository
             return $builder;
         }
 
-        $query = $this->entity::new()->newQuery();
+        $query = $this->getEntity()->newQuery();
 
         foreach ($conditions as $field => $condition) {
             if (is_int($field)) {
@@ -234,5 +211,10 @@ abstract class AbstractRepository
         $this->entity = $entity;
 
         return $this;
+    }
+
+    protected function getEntity(): AbstractEntity
+    {
+        return $this->entity::new();
     }
 }

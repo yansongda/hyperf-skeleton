@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use ArrayAccess;
-use Hyperf\Utils\Contracts\Arrayable as ArrayInterface;
+use Hyperf\Contract\Arrayable as ArrayInterface;
 use JsonSerializable as JsonSerializableInterface;
 use Serializable as SerializableInterface;
 use Yansongda\Supports\Traits\Accessable;

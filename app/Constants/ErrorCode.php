@@ -8,10 +8,9 @@ use Hyperf\Constants\AbstractConstants;
 use Hyperf\Constants\Annotation\Constants;
 
 /**
- * @Constants
- *
  * @method static string getMessage($code, array $params = [])
  */
+#[Constants]
 class ErrorCode extends AbstractConstants
 {
     /**

@@ -13,24 +13,14 @@ use Hyperf\Utils\Arr;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
-/**
- * Must handled before `Hyperf\Cache\Aspect\CacheableAspect`.
- *
- * @Aspect
- */
+#[Aspect]
 class CacheableBreakerAspect extends AbstractAspect
 {
-    /**
-     * @var array
-     */
-    public $annotations = [
+    public array $annotations = [
         CacheableBreaker::class,
     ];
 
-    /**
-     * @var int
-     */
-    public $priority = 100;
+    public ?int $priority = 100;
 
     protected ContainerInterface $container;
 
@@ -45,10 +35,8 @@ class CacheableBreakerAspect extends AbstractAspect
      * @author yansongda <me@yansongda.cn>
      *
      * @throws \Throwable
-     *
-     * @return mixed
      */
-    public function process(ProceedingJoinPoint $proceedingJoinPoint)
+    public function process(ProceedingJoinPoint $proceedingJoinPoint): mixed
     {
         $annotation = $this->getAnnotation($proceedingJoinPoint);
         $fallback = $this->getFallback($annotation);
@@ -78,10 +66,8 @@ class CacheableBreakerAspect extends AbstractAspect
      * @author yansongda <me@yansongda.cn>
      *
      * @throws \Throwable
-     *
-     * @return mixed
      */
-    protected function downgrade(ProceedingJoinPoint $proceedingJoinPoint, ?array $fallback)
+    protected function downgrade(ProceedingJoinPoint $proceedingJoinPoint, ?array $fallback): mixed
     {
         if (empty($fallback)) {
             return $proceedingJoinPoint->processOriginalMethod();
@@ -93,10 +79,6 @@ class CacheableBreakerAspect extends AbstractAspect
     }
 
     /**
-     * 获取数据源.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */

@@ -17,16 +17,9 @@ use Throwable;
 
 class UnknownExceptionHandler extends ExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ServerRequestInterface $request;
 
-    /**
-     * handle.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
         $this->stopPropagation();

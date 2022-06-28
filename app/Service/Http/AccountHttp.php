@@ -35,17 +35,12 @@ class AccountHttp
     }
 
     /**
-     * getUserInfo.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @Cacheable(prefix="access_token", ttl=36000)
-     * @CacheableBreaker(ignoreThrowables={"App\Exception\ApiException"})
-     *
      * @param string $accessToken 不带 Bearer 的
      *
      * @throws \App\Exception\ApiException
      */
+    #[Cacheable(prefix: 'access_token', ttl: 3600)]
+    #[CacheableBreaker(ignoreThrowables: ['App\\Exception\\ApiException'])]
     public function getUserInfo(string $accessToken): array
     {
         $results = $this->requestApi('get', 'oauth2/userinfo', ['headers' => [
@@ -66,18 +61,9 @@ class AccountHttp
     }
 
     /**
-     * requestApi.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @CircuitBreaker(
-     *     maxAttempts=1,
-     *     circuitBreakerState={"resetTimeout": 0},
-     *     fallback="App\Fallback\HttpServiceFallback@accountRequestApi"
-     * )
-     *
      * @throws \App\Exception\ApiException
      */
+    #[CircuitBreaker(maxAttempts: 1, circuitBreakerState: ['resetTimeout' => 0], fallback: 'App\\Fallback\\HttpServiceFallback@accountRequestApi')]
     protected function requestApi(string $method, string $endpoint, array $options): array
     {
         Logger::info('[AccountHttp] 请求用户中心接口', func_get_args());
@@ -98,7 +84,7 @@ class AccountHttp
             Logger::warning('[AccountHttp] 请求用户中心结果不正确', array_merge(func_get_args(), ['result' => $response]));
 
             return [];
-        } catch (ClientException $e) {
+        } catch (ClientException) {
             Logger::warning('[AccountHttp] 请求用户中心结果不正确:4xx 错误即，token 无效', func_get_args());
             // 4xx 错误即，token 无效
             return [];

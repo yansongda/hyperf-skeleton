@@ -7,15 +7,12 @@ namespace App\Service\Security;
 use App\Constants\ErrorCode;
 use App\Constants\Security\AccessTokenConstant;
 use App\Exception\ApiException;
-use App\Model\UserInfo;
 use App\Service\Http\AccountHttp;
 use Hyperf\Di\Annotation\Inject;
 
 class AccessTokenService
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected AccountHttp $accountHttp;
 
     /**
@@ -25,25 +22,14 @@ class AccessTokenService
      *
      * @throws \App\Exception\ApiException
      */
-    public function getUserInfo(string $accessToken): UserInfo
+    public function getUserInfo(string $accessToken): array
     {
         $info = $this->accountHttp->getUserInfo($accessToken);
 
-        $data = new UserInfo();
-        $data->unserializeArray($info);
-
-        if (isset($info['roles']) && 'superadmin' === $info['roles']) {
-            $data->setIsSuperAdmin(true);
-        }
-
-        if (is_null($data->get('vcc_id')) || is_null($data->get('scope'))) {
-            throw new ApiException(ErrorCode::AUTH_FAILED);
-        }
-
-        if (false === strpos($data->get('scope'), AccessTokenConstant::SCOPE)) {
+        if (!str_contains($info['scope'] ?? '', AccessTokenConstant::SCOPE)) {
             throw new ApiException(ErrorCode::NO_PERMISSION);
         }
 
-        return $data;
+        return $info;
     }
 }

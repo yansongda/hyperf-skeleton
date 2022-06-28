@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Aspect;
 
 use App\Annotation\RecordRequestLogger;
-use App\Constants\RequestConstant;
 use App\Exception\ApiException;
 use App\Util\Logger;
 use Hyperf\Di\Annotation\Aspect;
@@ -15,23 +14,16 @@ use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Throwable;
 
-/**
- * @Aspect(priority=2)
- */
+#[Aspect]
 class RecordRequestLoggerAspect extends AbstractAspect
 {
-    /**
-     * annotations.
-     *
-     * @var array
-     */
-    public $annotations = [
+    public array $annotations = [
         RecordRequestLogger::class,
     ];
 
-    /**
-     * @Inject
-     */
+    public ?int $priority = 1000;
+
+    #[Inject]
     protected RequestInterface $request;
 
     /**
@@ -40,12 +32,10 @@ class RecordRequestLoggerAspect extends AbstractAspect
      * @author yansongda <me@yansongda.cn>
      *
      * @throws \Throwable
-     *
-     * @return mixed
      */
-    public function process(ProceedingJoinPoint $proceedingJoinPoint)
+    public function process(ProceedingJoinPoint $proceedingJoinPoint): mixed
     {
-        if (false !== strpos($this->request->getHeaderLine('user-agent'), 'kube-probe')) {
+        if (str_contains($this->request->getHeaderLine('user-agent'), 'kube-probe')) {
             return $proceedingJoinPoint->process();
         }
 
@@ -54,7 +44,7 @@ class RecordRequestLoggerAspect extends AbstractAspect
             [
                 'url' => $this->request->fullUrl(),
                 'inputs' => $this->request->all(),
-                'auth' => $this->request->getAttribute(RequestConstant::ATTRIBUTE_AUTH),
+                'header' => $this->request->getHeaders(),
             ]
         );
 

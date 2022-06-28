@@ -20,10 +20,6 @@ abstract class AbstractService
 {
     /**
      * 获取所有数据.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @return \App\Model\Entity\AbstractEntity[]|Collection
      */
     public function find(array $condition, array $columns = ['*'], array $orders = [], ?int $offset = null, ?int $limit = null): Collection
     {
@@ -68,11 +64,6 @@ abstract class AbstractService
         return $entity;
     }
 
-    public function findOneWithTrashed(array $conditions, array $columns = ['*']): ?Model
-    {
-        return $this->repository->findOneWithTrashed($conditions, $columns);
-    }
-
     public function chunk(array $conditions, int $chunk, Closure $closure): bool
     {
         return $this->repository->chunk(...func_get_args());
@@ -84,8 +75,6 @@ abstract class AbstractService
      * @author yansongda <me@yansongda.cn>
      *
      * @param array $data 二维数组，批量创建
-     *
-     * @return \App\Model\Entity\AbstractEntity[]|Collection
      */
     public function create(int $vccId, array $data): Collection
     {
@@ -114,10 +103,8 @@ abstract class AbstractService
      * 更新单个记录.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return bool|Model
      */
-    public function updateOne(Model $model, array $data, bool $getUpdated = false)
+    public function updateOne(Model $model, array $data, bool $getUpdated = false): Model|bool
     {
         $res = $this->repository->update($model, $data);
 
@@ -188,14 +175,13 @@ abstract class AbstractService
      * paginate.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param string|int|null $perPage
      */
-    public function paginate(array $condition, $perPage = null, ?array $sorts = null, array $columns = ['*']): array
+    public function paginate(array $condition, int|string $perPage = null, ?array $sorts = null, array $columns = ['*']): array
     {
         $condition = (new \Yansongda\Supports\Collection($condition))
-            ->except(['per_page', 'current_page', 'sorts'])
+            ->except(['per_page', 'current_page', 'field', 'order'])
             ->toArray();
+
         $data = $this->repository->paginate(
             $condition,
             is_null($perPage) ? null : intval($perPage),

@@ -15,9 +15,7 @@ use Throwable;
 
 class HttpExceptionHandler extends ExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected RequestInterface $request;
 
     /**
@@ -25,7 +23,7 @@ class HttpExceptionHandler extends ExceptionHandler
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param \Throwable|HttpException $throwable
+     * @param HttpException $throwable
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {

@@ -9,8 +9,6 @@ use Hyperf\Di\Annotation\Inject;
 
 class DemoService extends AbstractService
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected DemoRepository $repository;
 }

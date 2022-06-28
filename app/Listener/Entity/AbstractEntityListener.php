@@ -15,15 +15,9 @@ abstract class AbstractEntityListener implements ListenerInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     abstract public function listen(): array;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(object $event)
+    public function process(object $event): void
     {
         if (!($event instanceof Event) ||
             !$this->isValid($event->getModel()) ||

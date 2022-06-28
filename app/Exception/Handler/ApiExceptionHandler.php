@@ -16,16 +16,9 @@ use Throwable;
 
 class ApiExceptionHandler extends ExceptionHandler
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected ServerRequestInterface $request;
 
-    /**
-     * handle.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
         $this->stopPropagation();
@@ -58,7 +51,6 @@ class ApiExceptionHandler extends ExceptionHandler
 
     protected function getMessage(Throwable $throwable): string
     {
-        return '' === $throwable->getMessage() ?
-        ErrorCode::getMessage($throwable->getCode()) : $throwable->getMessage();
+        return '' === $throwable->getMessage() ? ErrorCode::getMessage($throwable->getCode()) : $throwable->getMessage();
     }
 }

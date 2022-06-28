@@ -14,9 +14,7 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Utils\Arr;
 use Hyperf\Utils\Str;
 
-/**
- * @Listener
- */
+#[Listener]
 class DbListener implements ListenerInterface
 {
     /**
@@ -37,7 +35,7 @@ class DbListener implements ListenerInterface
     public function process(object $event): void
     {
         if ($event instanceof TransactionBeginning) {
-            Logger::info('数据库事务开始', [], ['channel' => 'sql']);
+            Logger::info('[DbListener] 数据库事务开始', [], ['channel' => 'sql']);
         }
 
         if ($event instanceof QueryExecuted) {
@@ -48,15 +46,15 @@ class DbListener implements ListenerInterface
                 }
             }
 
-            Logger::info(sprintf('[%s][%s] %s', $event->connectionName, $event->time, $sql), [], ['channel' => 'sql']);
+            Logger::info(sprintf('[DbListener] [%s][%s] %s', $event->connectionName, $event->time, $sql), [], ['channel' => 'sql']);
         }
 
         if ($event instanceof TransactionCommitted) {
-            Logger::info('数据库事务已提交', [], ['channel' => 'sql']);
+            Logger::info('[DbListener] 数据库事务已提交', [], ['channel' => 'sql']);
         }
 
         if ($event instanceof TransactionRolledBack) {
-            Logger::info('数据库事务已回滚', [], ['channel' => 'sql']);
+            Logger::info('[DbListener] 数据库事务已回滚', [], ['channel' => 'sql']);
         }
     }
 }

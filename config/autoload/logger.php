@@ -5,15 +5,16 @@ declare(strict_types=1);
 return [
     'default' => [
         'handler' => [
-            'class' => Yansongda\Supports\Logger\StdoutHandler::class,
+            'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
-                'level' => env('APP_DEBUG', false) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
+                'stream' => 'php://stdout',
+                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
             ],
         ],
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => '%datetime%|%level_name%|%message% %context%',
+                'format' => "%datetime%|%level_name%|%message% %context%\n",
                 'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
             ],
@@ -21,15 +22,16 @@ return [
     ],
     'system' => [
         'handler' => [
-            'class' => Yansongda\Supports\Logger\StdoutHandler::class,
+            'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
-                'level' => env('APP_DEBUG', false) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
+                'stream' => 'php://stdout',
+                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
             ],
         ],
         'formatter' => [
             'class' => Monolog\Formatter\LineFormatter::class,
             'constructor' => [
-                'format' => '%datetime%|%level_name%|%message% %context%',
+                'format' => "%datetime%|%level_name%|%message% %context%\n",
                 'dateFormat' => 'Y-m-d H:i:s.u',
                 'allowInlineLineBreaks' => true,
             ],
@@ -40,7 +42,7 @@ return [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
                 'stream' => BASE_PATH.'/runtime/logs/app.log',
-                'level' => env('APP_DEBUG', false) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
+                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
             ],
         ],
         'formatter' => [
