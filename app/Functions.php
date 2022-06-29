@@ -23,6 +23,7 @@ if (!function_exists('get_request_id')) {
         return Context::getOrSet(RequestConstant::HEADER_REQUEST_ID, uniqid());
     }
 }
+
 if (!function_exists('is_internal_request')) {
     /**
      * 是否内网域名 或 k8s.
