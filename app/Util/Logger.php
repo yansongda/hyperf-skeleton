@@ -27,7 +27,7 @@ class Logger
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public static function __callStatic(string $method, array $params)
+    public static function __callStatic(string $method, array $params): void
     {
         $channel = $params[2][0] ?? $params[2]['channel'] ?? LoggerConstant::CHANNEL_APP;
         $config = $params[2][1] ?? $params[2]['config'] ?? 'default';
