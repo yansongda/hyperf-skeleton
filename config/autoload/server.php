@@ -7,7 +7,7 @@ use Hyperf\Server\ServerInterface;
 use Swoole\Constant;
 
 return [
-    'mode' => SWOOLE_PROCESS,
+    'mode' => SWOOLE_BASE,
     'servers' => [
         [
             'name' => 'http',
@@ -22,8 +22,7 @@ return [
     ],
     'settings' => [
         Constant::OPTION_ENABLE_COROUTINE => true,
-        Constant::OPTION_WORKER_NUM => 2 * swoole_cpu_num(),
-        Constant::OPTION_REACTOR_NUM => 2 * swoole_cpu_num(),
+        Constant::OPTION_WORKER_NUM => swoole_cpu_num(),
         Constant::OPTION_PID_FILE => BASE_PATH.'/runtime/app.pid',
         Constant::OPTION_OPEN_TCP_NODELAY => true,
         Constant::OPTION_MAX_COROUTINE => 100000,
