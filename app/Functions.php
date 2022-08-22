@@ -31,8 +31,8 @@ if (!function_exists('is_internal_request')) {
     function is_internal_request(string $host): bool
     {
         return (false !== filter_var($host, FILTER_VALIDATE_IP) && (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)))
-            || str_contains($host, RequestConstant::DOMAIN_K8S_SERVICE)
-            || str_contains($host, RequestConstant::DOMAIN_INTERNAL);
+            || str_contains(RequestConstant::DOMAIN_K8S_SERVICE, $host)
+            || str_contains(RequestConstant::DOMAIN_INTERNAL, $host);
     }
 }
 

@@ -38,9 +38,9 @@ class RequestConstant
     /**
      * K8S service.
      */
-    public const DOMAIN_K8S_SERVICE = 'yansongda-api';
+    public const DOMAIN_K8S_SERVICE = 'yansongda-app.yansongda-prod:8080';
 
-    public const DOMAIN_INTERNAL = 'yansongda-internal';
+    public const DOMAIN_INTERNAL = 'internal.yansongda.cn;';
 
     /**
      * 等待 produce 的消息 key.
