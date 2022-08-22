@@ -58,3 +58,45 @@ if (!function_exists('do_parallel')) {
         return $results ?? [];
     }
 }
+
+if (!function_exists('to_array')) {
+    /**
+     * 将 string 转换成 array.
+     */
+    function to_array(mixed $value): array
+    {
+        if (is_string($value)) {
+            $value = explode(',', $value);
+        }
+
+        if (is_array($value)) {
+            return array_filter($value, function ($value) {
+                return !is_null($value) && '' !== $value;
+            });
+        }
+
+        return [];
+    }
+}
+
+if (!function_exists('to_bool')) {
+    /**
+     * 将 string 转换成 bool.
+     */
+    function to_bool(bool|string|null $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ('false' === $value) {
+            return false;
+        }
+
+        if ('true' === $value) {
+            return true;
+        }
+
+        return boolval($value);
+    }
+}
