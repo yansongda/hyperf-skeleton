@@ -80,10 +80,7 @@ if (!function_exists('to_array')) {
 }
 
 if (!function_exists('to_bool')) {
-    /**
-     * 将 string 转换成 bool.
-     */
-    function to_bool(bool|string|null $value): bool
+    function to_bool(mixed $value): bool
     {
         if (is_bool($value)) {
             return $value;
