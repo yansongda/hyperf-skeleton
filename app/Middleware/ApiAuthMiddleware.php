@@ -107,10 +107,8 @@ class ApiAuthMiddleware implements MiddlewareInterface
      */
     protected function internalAuthenticate(): ?array
     {
-        $host = explode(':', $this->request->getHeaderLine('host'))[0];
-
         if ($this->request->hasHeader(RequestConstant::HEADER_TOKEN_INTERNAL_IDENTITY)
-            && is_internal_request($host)) {
+            && is_internal_host($this->request->getHeaderLine('host'))) {
             $oauth = [
                 'user_id' => 1,
                 'user_name' => '内网环境',

@@ -18,9 +18,7 @@ class InternalApiMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $host = explode(':', $request->getHeaderLine('host'))[0];
-
-        if (is_internal_request($host)) {
+        if (is_internal_host($request->getHeaderLine('host'))) {
             return $handler->handle($request);
         }
 

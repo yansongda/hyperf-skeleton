@@ -1,0 +1,34 @@
+image: registry.cn-shenzhen.aliyuncs.com/yansongda/php:cli-8.1-alpine
+
+stages:
+    - coding_style
+    - tests
+
+before_script:
+    - composer install --no-progress
+
+coding_lint:
+    stage: coding_style
+    only:
+        - main
+        - develop
+        - merge_requests
+    script:
+        - composer cs-fix
+phpstan:
+    stage: coding_style
+    only:
+        - main
+        - develop
+        - merge_requests
+    script:
+        - composer analyse
+
+unit_tests:
+    stage: tests
+    only:
+        - main
+        - develop
+        - merge_requests
+    script:
+        - composer test

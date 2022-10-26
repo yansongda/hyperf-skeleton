@@ -24,13 +24,12 @@ if (!function_exists('get_request_id')) {
     }
 }
 
-if (!function_exists('is_internal_request')) {
-    /**
-     * 是否内网域名 或 k8s.
-     */
-    function is_internal_request(string $host): bool
+if (!function_exists('is_internal_host')) {
+    function is_internal_host(string $host): bool
     {
-        return (false !== filter_var($host, FILTER_VALIDATE_IP) && (false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)))
+        $hostIp = explode(':', $host)[0] ?? '';
+
+        return (false !== filter_var($hostIp, FILTER_VALIDATE_IP) && (false === filter_var($hostIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) || false === filter_var($hostIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)))
             || str_contains(RequestConstant::DOMAIN_K8S_SERVICE, $host)
             || str_contains(RequestConstant::DOMAIN_INTERNAL, $host);
     }
@@ -63,10 +62,10 @@ if (!function_exists('to_array')) {
     /**
      * 将 string 转换成 array.
      */
-    function to_array(mixed $value): array
+    function to_array(array|string|null $value): array
     {
         if (is_string($value)) {
-            $value = explode(',', $value);
+            $value = explode(',', str_replace('，', ',', $value));
         }
 
         if (is_array($value)) {
@@ -75,7 +74,7 @@ if (!function_exists('to_array')) {
             });
         }
 
-        return [];
+        return (array) $value;
     }
 }
 
