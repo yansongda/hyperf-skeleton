@@ -7,24 +7,21 @@ namespace App\Fallback;
 use App\Constants\ErrorCode;
 use App\Exception\ApiException;
 use App\Util\Logger;
+use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
 class HttpServiceFallback
 {
     /**
-     * 降级处理.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \App\Exception\ApiException
+     * @throws ApiException
      */
-    public function accountRequestApi(string $method, string $endpoint, array $options, ?Throwable $throwable): void
+    public function generalRequest(string $method, string $endpoint, array $options, ?Throwable $throwable): ResponseInterface
     {
-        Logger::error(
-            '[HttpServiceFallback][Account] 重试 2 次后请求用户中心出现异常或超时，上帝也拯救不了后续流程了，赶紧检查处理',
+        Logger::warning(
+            '[HttpServiceFallback][general] 尝试 2 次后请求第三方接口出现异常或超时，请检查',
             func_get_args()
         );
 
-        throw new ApiException(ErrorCode::ACCOUNT_ERROR);
+        throw new ApiException(ErrorCode::THIRD_API_ERROR, $throwable?->getMessage() ?? null);
     }
 }

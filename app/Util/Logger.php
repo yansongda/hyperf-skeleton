@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Util;
 
-use App\Constants\LoggerConstant;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Logger\LoggerFactory;
-use Hyperf\Utils\ApplicationContext;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,12 +25,12 @@ use Psr\Log\LoggerInterface;
 class Logger
 {
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function __callStatic(string $method, array $params): void
     {
-        $channel = $params[2][0] ?? $params[2]['channel'] ?? LoggerConstant::CHANNEL_APP;
+        $channel = $params[2][0] ?? $params[2]['channel'] ?? 'app';
         $config = $params[2][1] ?? $params[2]['config'] ?? 'default';
         $logger = Logger::get($channel, $config);
 
@@ -39,8 +40,8 @@ class Logger
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $container): LoggerInterface
     {
@@ -48,8 +49,8 @@ class Logger
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function get(string $name = 'app', string $config = 'default'): LoggerInterface
     {

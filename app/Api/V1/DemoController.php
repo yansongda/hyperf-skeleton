@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Api\V1;
 
-use App\Annotation\RecordRequestLogger;
 use App\Api\AbstractApiController;
 use App\Util\Logger;
 use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\RequestMapping;
 
 #[Controller(prefix: 'api/v1/demo')]
-#[RecordRequestLogger]
 class DemoController extends AbstractApiController
 {
-    #[GetMapping(path: '')]
+    #[RequestMapping(path: '')]
     public function health(): array
     {
         Logger::info('demo');

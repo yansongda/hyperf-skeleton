@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Middleware\RequestIdLoggerProcessor;
+use Monolog\Level;
+
+use function Hyperf\Support\env;
 
 return [
     'default' => [
@@ -10,7 +13,7 @@ return [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
                 'stream' => 'php://stdout',
-                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
+                'level' => env('APP_DEBUG', false) ? Level::Debug : Level::Info,
             ],
         ],
         'formatter' => [
@@ -33,7 +36,7 @@ return [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
                 'stream' => 'php://stdout',
-                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
+                'level' => env('APP_DEBUG', false) ? Level::Debug : Level::Info,
             ],
         ],
         'formatter' => [
@@ -56,7 +59,7 @@ return [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
                 'stream' => BASE_PATH.'/runtime/logs/app.log',
-                'level' => env('APP_DEBUG', false) ? Monolog\Level::Debug : Monolog\Level::Info,
+                'level' => env('APP_DEBUG', false) ? Level::Debug : Level::Info,
             ],
         ],
         'formatter' => [

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Util;
 
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Redis\RedisProxy;
-use Hyperf\Utils\ApplicationContext;
 
 class Redis
 {

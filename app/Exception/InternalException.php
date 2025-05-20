@@ -9,10 +9,9 @@ use Throwable;
 
 class InternalException extends ApiException
 {
-    /**
-     * Bootstrap.
-     */
-    public function __construct(int $code = ErrorCode::INTERNAL_PARAMS_ERROR, ?string $message = null, ?array $raw = null, Throwable $previous = null)
+    public ?array $raw = null;
+
+    public function __construct(ErrorCode $code = ErrorCode::INTERNAL_PARAMS_ERROR, ?string $message = null, ?array $raw = null, ?Throwable $previous = null)
     {
         parent::__construct($code, $message, $raw, $previous);
     }

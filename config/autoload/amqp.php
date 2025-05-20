@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use function Hyperf\Support\env;
+
 return [
     'default' => [
         'host' => env('AMQP_HOST', 'localhost'),
@@ -10,21 +12,21 @@ return [
         'password' => env('AMQP_PASSWORD', 'guest'),
         'vhost' => env('AMQP_VHOST', '/'),
         'concurrent' => [
-            'limit' => 30,
+            'limit' => (int) env('MQ_CONCURRENT_LIMIT', 30),
         ],
         'pool' => [
-            'connections' => 5,
+            'connections' => 2,
         ],
         'params' => [
             'insist' => false,
             'login_method' => 'AMQPLAIN',
             'login_response' => null,
             'locale' => 'en_US',
-            'connection_timeout' => 3,
-            'read_write_timeout' => 6,
+            'connection_timeout' => 3.0,
+            'read_write_timeout' => 120.0,
             'context' => null,
             'keepalive' => true,
-            'heartbeat' => 3,
+            'heartbeat' => 60,
             'channel_rpc_timeout' => 0.0,
             'close_on_destruct' => false,
             'max_idle_channels' => 10,

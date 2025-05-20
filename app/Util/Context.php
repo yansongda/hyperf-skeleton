@@ -14,17 +14,24 @@ use Hyperf\Context\Context as HContext;
  */
 class Context
 {
-    public static function __callStatic(string $method, array $params): mixed
+    /**
+     * @return mixed
+     */
+    public static function __callStatic(string $method, array $params)
     {
         return HContext::{$method}(...$params);
     }
 
-    public static function append(string $key, mixed $value): void
+    public static function append(string $key, mixed $value, ?string $valueKey = null): void
     {
         $contextValue = HContext::getOrSet($key, []);
 
         if (is_array($contextValue)) {
-            $contextValue[] = $value;
+            if (is_null($valueKey)) {
+                $contextValue[] = $value;
+            } else {
+                $contextValue[$valueKey] = $value;
+            }
 
             HContext::set($key, $contextValue);
         }

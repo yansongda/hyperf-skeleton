@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use App\Constants\RequestConstant;
-use Hyperf\Context\Context;
+use App\Util\Context;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -15,7 +16,7 @@ use Yansongda\Supports\Str;
 class RequestIdMiddleware implements MiddlewareInterface
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
+use App\Event\Metric;
+use App\Model\Metric\Sql;
 use App\Util\Logger;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Events\QueryExecuted;
 use Hyperf\Database\Events\TransactionBeginning;
 use Hyperf\Database\Events\TransactionCommitted;
 use Hyperf\Database\Events\TransactionRolledBack;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 #[Listener]
 class DbListener implements ListenerInterface
 {
-    /**
-     * listen.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
+    public function __construct(protected ContainerInterface $container) {}
+
     public function listen(): array
     {
         return [
@@ -32,6 +35,10 @@ class DbListener implements ListenerInterface
         ];
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function process(object $event): void
     {
         if ($event instanceof TransactionBeginning) {
@@ -42,11 +49,11 @@ class DbListener implements ListenerInterface
             $sql = $event->sql;
             if (!Arr::isAssoc($event->bindings)) {
                 foreach ($event->bindings as $value) {
-                    $sql = Str::replaceFirst('?', "'$value'", $sql);
+                    $sql = Str::replaceFirst('?', "'{$value}'", $sql);
                 }
             }
 
-            Logger::info(sprintf('[DbListener] [%s][%s] %s', $event->connectionName, $event->time, $sql), [], ['channel' => 'sql']);
+            $this->metric($sql, $event->time, $event->connectionName);
         }
 
         if ($event instanceof TransactionCommitted) {
@@ -56,5 +63,18 @@ class DbListener implements ListenerInterface
         if ($event instanceof TransactionRolledBack) {
             Logger::info('[DbListener] 数据库事务已回滚', [], ['channel' => 'sql']);
         }
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function metric(string $sql, float $duration, string $connection): void
+    {
+        $this->container->get(EventDispatcherInterface::class)->dispatch(new Metric(new Sql([
+            'connection' => $connection,
+            'sql' => $sql,
+            'duration' => $duration / 1000,
+        ])));
     }
 }

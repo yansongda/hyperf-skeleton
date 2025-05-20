@@ -15,11 +15,6 @@ abstract class AbstractRepository
 {
     protected AbstractEntity $entity;
 
-    /**
-     * Bootstrap.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function __construct(string $entity)
     {
         if (class_exists($entity)) {
@@ -27,11 +22,11 @@ abstract class AbstractRepository
         }
     }
 
-    public function findOne(array $conditions, array $columns = ['*'], string $latest = 'id'): ?AbstractEntity
+    public function findOne(array $conditions, array $columns = ['*'], string $latest = 'id', ?Builder $builder = null, ?string $connection = null): ?AbstractEntity
     {
-        $query = $this->getQueryCondition($conditions);
+        $query = $this->getQueryCondition($conditions, $builder, $connection);
 
-        /** @var \App\Model\Entity\AbstractEntity $data */
+        /** @var AbstractEntity $data */
         $data = $query->latest($latest)->take(1)->first($columns);
 
         return $data;
@@ -59,7 +54,8 @@ abstract class AbstractRepository
     /**
      * 带上表关系查找所有数据.
      *
-     * @param array $relations 关系 eg: ['template' => ['id', 'name']]
+     * @param array  $relations 关系 eg: ['template' => ['id', 'name']]
+     * @param ?array $extra     ['limit' => 1, 'offset' => 1, 'orders' => [$field => $order]]
      */
     public function findWithRelations(array $conditions, array $relations = [], array $columns = ['*'], ?array $extra = null, ?Builder $builder = null): Collection
     {
@@ -94,11 +90,7 @@ abstract class AbstractRepository
     }
 
     /**
-     * paginate.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param array|null $sorts 排序；使用多维数组进行多个字段排序. 举例： ['id' => 'desc', 'created_at' => 'asc']
+     * @param null|array $sorts 排序；使用多维数组进行多个字段排序. 举例： ['id' => 'desc', 'created_at' => 'asc']
      */
     public function paginate(array $conditions, ?int $perPage = null, ?array $sorts = null, array $columns = ['*'], ?Builder $builder = null): LengthAwarePaginatorInterface
     {
@@ -115,8 +107,6 @@ abstract class AbstractRepository
 
     /**
      * 批量赋值新建.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function create(array $data): Model
     {
@@ -125,8 +115,6 @@ abstract class AbstractRepository
 
     /**
      * 批量赋值更新.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function update(Model $entity, array $data): bool
     {
@@ -142,42 +130,51 @@ abstract class AbstractRepository
     /**
      * 更新或创建.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param array $conditions 需要查询更新的条件
+     * @param array $condition  需要查询更新的条件
      * @param array $attributes 需要更新或者新增的内容
      */
-    public function updateOrCreate(array $conditions, array $attributes): Model
+    public function updateOrCreate(array $condition, array $attributes): Model
     {
-        return $this->getEntity()->newQuery()->updateOrCreate($conditions, $attributes);
+        return $this->getEntity()->newQuery()->updateOrCreate($condition, $attributes);
     }
 
     /**
      * 查找一条数据，如果不存在就创建.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param array $conditions 需要查询更新的条件
+     * @param array $condition  需要查询更新的条件
      * @param array $attributes 需要新增的内容
      */
-    public function firstOrCreate(array $conditions, array $attributes): AbstractEntity
+    public function firstOrCreate(array $condition, array $attributes): AbstractEntity
     {
-        /** @var \App\Model\Entity\AbstractEntity $result */
-        $result = $this->getEntity()->newQuery()->firstOrCreate($conditions, $attributes);
+        /** @var AbstractEntity $result */
+        $result = $this->getEntity()->newQuery()->firstOrCreate($condition, $attributes);
 
         return $result;
     }
 
-    public function delete(array $conditions): void
+    public function delete(array $condition): void
     {
-        foreach ($this->find($conditions) as $model) {
+        $models = $this->find($condition);
+
+        foreach ($models as $model) {
+            $model->delete();
+        }
+    }
+
+    public function deleteByIds(int $vccId, array $ids): void
+    {
+        $data = $this->getEntity()->newQuery()->where('vcc_id', $vccId)
+            ->whereIn('id', $ids)
+            ->get();
+
+        foreach ($data as $model) {
             $model->delete();
         }
     }
 
     public function directDelete(array $conditions): void
     {
-        $this->getEntity()->newQuery()->where($conditions)->delete();
+        $this->getQueryCondition($conditions)->delete();
     }
 
     public function chunk(array $conditions, int $chunk, Closure $closure): bool
@@ -185,13 +182,24 @@ abstract class AbstractRepository
         return $this->getQueryCondition($conditions)->chunk($chunk, $closure);
     }
 
-    protected function getQueryCondition(array $conditions, ?Builder $builder = null): Builder
+    public function insert(array $data): bool
+    {
+        return $this->getEntity()->newQuery()->insert($data);
+    }
+
+    public function getQueryCondition(array $conditions, ?Builder $builder = null, ?string $connection = null): Builder
     {
         if (!is_null($builder)) {
             return $builder;
         }
 
-        $query = $this->getEntity()->newQuery();
+        $entity = $this->getEntity();
+
+        if (!is_null($connection)) {
+            $entity->setConnection($connection);
+        }
+
+        $query = $entity->newQuery();
 
         foreach ($conditions as $field => $condition) {
             if (is_int($field)) {

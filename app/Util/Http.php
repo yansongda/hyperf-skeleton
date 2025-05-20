@@ -9,21 +9,26 @@ use GuzzleHttp\HandlerStack;
 use Hyperf\Guzzle\CoroutineHandler;
 use Hyperf\Guzzle\HandlerStackFactory;
 
+use function Hyperf\Support\make;
+
 class Http
 {
-    public static function createPool(array $options = [], array $poolOptions = []): Client
+    public static function createPool(array $options = [], array $poolOptions = [], array $middlewares = []): Client
     {
         return make(Client::class, [
             'config' => array_merge(
                 [
                     'handler' => (new HandlerStackFactory())->create(array_merge([
-                        'min_connections' => 1,
-                        'max_connections' => 30,
+                        'min_connections' => 5,
+                        'max_connections' => 100,
                         'wait_timeout' => 3.0,
                         'max_idle_time' => 30,
-                    ], $poolOptions)),
-                    'connect_timeout' => 1.0,
-                    'timeout' => 2.0,
+                    ], $poolOptions), $middlewares),
+                    'timeout' => 1.0,
+                    'headers' => [
+                        'User-Agent' => 'yansongda/hyperf-skeleton',
+                        'X-author' => ['yansongda <me@yansongda.cn>'],
+                    ],
                 ],
                 $options,
             ),
@@ -36,8 +41,11 @@ class Http
             'config' => array_merge(
                 [
                     'handler' => HandlerStack::create(new CoroutineHandler()),
-                    'connect_timeout' => 1.0,
                     'timeout' => 5.0,
+                    'headers' => [
+                        'User-Agent' => 'yansongda/hyperf-skeleton',
+                        'X-author' => ['yansongda <me@yansongda.cn>'],
+                    ],
                 ],
                 $options,
             ),

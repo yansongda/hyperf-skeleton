@@ -1,7 +1,7 @@
-version: '3.4'
+version: '3.8'
 services:
-    yansongda:
-        image: registry.cn-shenzhen.aliyuncs.com/yansongda/skeleton:hyperf-8.1
+    easycti:
+        image: registry.cn-shenzhen.aliyuncs.com/yansongda/skeleton:hyperf-8.3
         container_name: yansongda
         restart: always
         networks:
@@ -10,6 +10,10 @@ services:
             - "8080:8080"
         volumes:
             - ./:/www
+        cap_add:
+            - SYS_PTRACE
+        sysctls:
+            - net.unix.max_dgram_qlen=10
 
 networks:
     yansongda:

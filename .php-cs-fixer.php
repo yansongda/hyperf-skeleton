@@ -1,26 +1,23 @@
 <?php
 
 return (new PhpCsFixer\Config())
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setUsingCache(false)
     ->setRiskyAllowed(true)
     ->setRules([
-        '@Symfony' => true,
+        '@PhpCsFixer' => true,
         'declare_strict_types' => true,
-        'class_attributes_separation' => true,
-        'ordered_class_elements' => true,
-        'ordered_imports' => ['sort_algorithm' => 'alpha'],
-        'line_ending' => true,
-        'single_quote' => true,
-        'array_syntax' => ['syntax' => 'short'],
+        'return_assignment' => false,
+        'single_line_comment_style' => ['comment_types' => ['hash']],
+        'general_phpdoc_annotation_remove' => ['annotations' => ['author'], 'case_sensitive' => false],
+        'global_namespace_import' => [
+            'import_classes' => true,
+            'import_constants' => true,
+            'import_functions' => true,
+        ],
+        'multiline_whitespace_before_semicolons' => ['strategy' => 'no_multi_line'],
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
-            ->exclude('grpc')
-            ->exclude('storage')
-            ->exclude('public')
-            ->exclude('runtime')
-            ->exclude('vendor')
-            ->exclude('test')
-            ->exclude('config')
-            ->in(__DIR__)
+            ->in('app')
     );

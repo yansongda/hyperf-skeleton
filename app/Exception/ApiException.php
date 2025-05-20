@@ -12,12 +12,9 @@ class ApiException extends Exception
 {
     public ?array $raw = null;
 
-    /**
-     * Bootstrap.
-     */
-    public function __construct(int $code = ErrorCode::UNKNOWN_ERROR, ?string $message = null, ?array $raw = null, Throwable $previous = null)
+    public function __construct(ErrorCode $code = ErrorCode::UNKNOWN_ERROR, ?string $message = null, ?array $raw = null, ?Throwable $previous = null)
     {
-        if (is_null($message) || '' === $message) {
+        if (empty($message)) {
             $message = ErrorCode::getMessage($code);
         }
 
@@ -25,6 +22,6 @@ class ApiException extends Exception
             $this->raw = $raw;
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code->value, $previous);
     }
 }

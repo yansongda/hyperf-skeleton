@@ -4,117 +4,57 @@ declare(strict_types=1);
 
 namespace App\Constants;
 
-use Hyperf\Constants\AbstractConstants;
 use Hyperf\Constants\Annotation\Constants;
+use Hyperf\Constants\Annotation\Message;
+use Hyperf\Constants\EnumConstantsTrait;
 
 /**
  * @method static string getMessage($code, array $params = [])
  */
 #[Constants]
-class ErrorCode extends AbstractConstants
+enum ErrorCode: int
 {
-    /**
-     * @Message("未知错误")
-     */
-    public const UNKNOWN_ERROR = 9999;
+    use EnumConstantsTrait;
+
+    #[Message('未知错误')]
+    case UNKNOWN_ERROR = 9999;
 
     /**
-     * 认证相关错误.
+     * 系统业务错误.
      */
+    #[Message('认证失败：Authorization 头不存在')]
+    case AUTH_HEADER_NOT_EXIST = 1000;
+
+    #[Message('认证失败：token 非法')]
+    case AUTH_FAILED = 1001;
+
+    #[Message('认证失败：权限不足')]
+    case AUTH_NO_PERMISSION = 1002;
 
     /**
-     * @Message("认证失败, Authorization 头不存在")
+     * 客户端参数错误.
      */
-    public const AUTH_HEADER_NOT_EXIST = 1000;
+    #[Message('参数错误，请参考 API 文档')]
+    case PARAMS_INVALID = 1100;
 
-    /**
-     * @Message("认证失败, token 非法")
-     */
-    public const AUTH_FAILED = 1001;
-
-    /**
-     * @Message("权限不足")
-     */
-    public const NO_PERMISSION = 1002;
-
-    /**
-     * @Message("登录失败，请联系管理员")
-     */
-    public const AUTH_CODE_FAILED = 1003;
-
-    /**
-     * 客户端参数错误，ApiException.
-     */
-
-    /**
-     * @Message("参数错误，请参考 API 文档")
-     */
-    public const INVALID_PARAMS = 2000;
-
-    /**
-     * @Message("没有符合条件的数据")
-     */
-    public const DATA_NOT_FOUND = 2001;
-
-    /**
-     * @Message("已存在相同数据")
-     */
-    public const SAME_DATA_FOUND = 2002;
-
-    /**
-     * 文件相关.
-     */
-
-    /**
-     * @Message("文件错误")
-     */
-    public const FILE_ERROR = 3000;
-
-    /**
-     * @Message("文件保存错误")
-     */
-    public const FILE_STORED_ERROR = 3001;
+    #[Message('参数错误：没有符合条件的数据')]
+    case PARAMS_DATA_NOT_FOUND = 1101;
 
     /**
      * 第三方 API 错误.
      */
+    #[Message('内部错误, 请联系管理员')]
+    case THIRD_API_ERROR = 5000;
 
-    /**
-     * 供应商 API 有问题.
-     *
-     * @Message("服务不可用, 请联系管理员")
-     */
-    public const SERVICE_UNAVAILABLE = 5000;
-
-    /**
-     * 用户中心有误.
-     *
-     * @Message("用户中心出错, 请联系管理员")
-     */
-    public const ACCOUNT_ERROR = 5001;
-
-    /**
-     * elasticsearch 错误.
-     *
-     * @Message("内部错误, 请联系管理员")
-     */
-    public const ELASTICSEARCH_ERROR = 5002;
-
-    /**
-     * 系统错误.
-     */
+    #[Message('内部错误, 请联系管理员')]
+    case OAUTH2_ERROR = 5001;
 
     /**
      * 内部参数错误.
-     *
-     * @Message("内部错误, 请联系管理员")
      */
-    public const INTERNAL_PARAMS_ERROR = 6000;
+    #[Message('内部错误, 请联系管理员')]
+    case INTERNAL_PARAMS_ERROR = 9900;
 
-    /**
-     * 数据库错误.
-     *
-     * @Message("内部错误, 请联系管理员")
-     */
-    public const DB_ERROR = 6001;
+    #[Message('内部错误，请重试或联系管理员')]
+    case INTERNAL_MUTEX_LOCKER_ERROR = 9901;
 }

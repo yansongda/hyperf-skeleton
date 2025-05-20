@@ -19,9 +19,9 @@ abstract class AbstractEntityListener implements ListenerInterface
 
     public function process(object $event): void
     {
-        if (!($event instanceof Event) ||
-            !$this->isValid($event->getModel()) ||
-            !method_exists($this, $event->getMethod())) {
+        if (!($event instanceof Event)
+            || !$this->isValid($event->getModel())
+            || !method_exists($this, $event->getMethod())) {
             return;
         }
 

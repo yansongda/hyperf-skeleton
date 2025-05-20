@@ -6,11 +6,13 @@ namespace App\Aspect;
 
 use App\Annotation\CacheableBreaker;
 use App\Util\Logger;
+use Hyperf\Collection\Arr;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
-use Hyperf\Utils\Arr;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
 
 #[Aspect]
@@ -22,19 +24,10 @@ class CacheableBreakerAspect extends AbstractAspect
 
     public ?int $priority = 100;
 
-    protected ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+    public function __construct(protected ContainerInterface $container) {}
 
     /**
-     * process.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function process(ProceedingJoinPoint $proceedingJoinPoint): mixed
     {
@@ -63,9 +56,7 @@ class CacheableBreakerAspect extends AbstractAspect
     /**
      * 进行降级.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function downgrade(ProceedingJoinPoint $proceedingJoinPoint, ?array $fallback): mixed
     {
@@ -79,8 +70,8 @@ class CacheableBreakerAspect extends AbstractAspect
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getFallback(?CacheableBreaker $annotation): ?array
     {

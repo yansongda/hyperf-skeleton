@@ -17,4 +17,9 @@ abstract class AbstractModel implements ArrayInterface, JsonSerializableInterfac
     use Accessable;
     use Arrayable;
     use Serializable;
+
+    public function __construct(array $value = [])
+    {
+        $this->unserializeArray($value);
+    }
 }

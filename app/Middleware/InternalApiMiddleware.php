@@ -11,17 +11,19 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+use function App\is_internal_request;
+
 class InternalApiMiddleware implements MiddlewareInterface
 {
     /**
-     * @throws \App\Exception\ApiException
+     * @throws ApiException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (is_internal_host($request->getHeaderLine('host'))) {
+        if (is_internal_request($request->getHeaderLine('host'))) {
             return $handler->handle($request);
         }
 
-        throw new ApiException(ErrorCode::NO_PERMISSION);
+        throw new ApiException(ErrorCode::AUTH_NO_PERMISSION);
     }
 }

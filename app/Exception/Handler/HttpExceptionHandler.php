@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Exception\Handler;
 
 use App\Constants\RequestConstant;
+use Hyperf\Codec\Json;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Exception\HttpException;
@@ -19,10 +20,6 @@ class HttpExceptionHandler extends ExceptionHandler
     protected RequestInterface $request;
 
     /**
-     * handle.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @param HttpException $throwable
      */
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
@@ -39,14 +36,9 @@ class HttpExceptionHandler extends ExceptionHandler
         return $response
             ->withStatus(200)
             ->withHeader('Content-type', 'application/json')
-            ->withBody(new SwooleStream(json_encode($data)));
+            ->withBody(new SwooleStream(Json::encode($data)));
     }
 
-    /**
-     * isValid.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
     public function isValid(Throwable $throwable): bool
     {
         return $throwable instanceof HttpException;

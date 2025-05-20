@@ -11,9 +11,6 @@ use App\Repository\DemoRepository;
  */
 class Demo extends AbstractEntity
 {
-    /**
-     * @var string
-     */
     protected $repository = DemoRepository::class;
 
     protected ?string $table = 'demo';
