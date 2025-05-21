@@ -25,11 +25,8 @@ enum ErrorCode: int
     #[Message('认证失败：Authorization 头不存在')]
     case AUTH_HEADER_NOT_EXIST = 1000;
 
-    #[Message('认证失败：token 非法')]
-    case AUTH_FAILED = 1001;
-
     #[Message('认证失败：权限不足')]
-    case AUTH_NO_PERMISSION = 1002;
+    case AUTH_NO_PERMISSION = 1001;
 
     /**
      * 客户端参数错误.

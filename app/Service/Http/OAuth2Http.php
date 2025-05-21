@@ -46,10 +46,6 @@ class OAuth2Http extends GeneralHttp
             throw new ApiException(ErrorCode::OAUTH2_ERROR);
         }
 
-        if (!isset($results['vcc_id'])) {
-            throw new ApiException(ErrorCode::AUTH_FAILED);
-        }
-
         return new VerifyInfo($results);
     }
 

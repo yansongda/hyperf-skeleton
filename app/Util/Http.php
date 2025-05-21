@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Util;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use Hyperf\Guzzle\CoroutineHandler;
 use Hyperf\Guzzle\HandlerStackFactory;
 
 use function Hyperf\Support\make;
@@ -40,7 +38,6 @@ class Http
         return make(Client::class, [
             'config' => array_merge(
                 [
-                    'handler' => HandlerStack::create(new CoroutineHandler()),
                     'timeout' => 5.0,
                     'headers' => [
                         'User-Agent' => 'yansongda/hyperf-skeleton',
