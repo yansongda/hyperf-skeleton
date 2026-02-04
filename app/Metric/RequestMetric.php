@@ -22,14 +22,6 @@ class RequestMetric implements MetricInterface
             return;
         }
 
-        $extra = $metric->getExtra();
-
-        if (0 === $metric->getCode()) {
-            Logger::info('<-- 处理业务请求完毕', ['time' => $metric->getDuration(), 'response' => $extra['response'] ?? null]);
-        } else {
-            Logger::info('<-- 业务处理被中断', ['time' => $metric->getDuration(), 'code' => $metric->getCode(), 'message' => $extra['message'] ?? '', 'raw' => $extra['raw'] ?? null]);
-        }
-
         if ($metric->getDuration() > 10) {
             Logger::warning('[RequestMetric] 处理时间大于10s，请检查', ['duration' => $metric->getDuration()]);
         }

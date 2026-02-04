@@ -25,7 +25,7 @@ class RequestLoggerMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         /** @var \Hyperf\HttpMessage\Server\Request $request */
-        if (str_contains($request->getHeaderLine('user-agent'), 'kube-probe')) {
+        if (str_contains($request->getHeaderLine('user-agent'), 'kube-probe') || 'OPTIONS' == $request->getMethod()) {
             return $handler->handle($request);
         }
 
@@ -33,8 +33,10 @@ class RequestLoggerMiddleware implements MiddlewareInterface
             '--> 处理业务请求',
             [
                 'url' => $request->fullUrl(),
+                'method' => $request->getMethod(),
                 'inputs' => $request->getParsedBody(),
-                'header' => $request->getHeaders(),
+                'headers' => $request->getHeaders(),
+                'cookies' => $request->getCookieParams(),
             ]
         );
 
@@ -44,28 +46,47 @@ class RequestLoggerMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
 
             $elapsed = microtime(true) - $startTime;
+
+            Logger::info('<-- 处理业务请求完毕', ['time' => $elapsed, 'response' => $this->getLogResponse($response)]);
         } catch (Throwable $e) {
             $elapsed = microtime(true) - $startTime;
 
             if ($e instanceof ApiException) {
-                $this->metric($request->fullUrl(), $elapsed, $e->getCode(), ['message' => $e->getMessage(), 'raw' => $e->raw]);
+                $this->metric($request->fullUrl(), $elapsed, $e->getCode());
+
+                Logger::info('<-- 业务处理被中断', ['time' => $elapsed, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
             }
 
             throw $e;
         }
 
-        $this->metric($request->fullUrl(), $elapsed, 0, ['response' => str_contains($response->getHeaderLine('content-type'), 'application/json') ? (string) $response->getBody() : '非 json 响应']);
+        $this->metric($request->fullUrl(), $elapsed);
 
         return $response;
     }
 
-    protected function metric(string $url, float $elapsed, int $code = 0, array $extra = []): void
+    protected function getLogResponse(ResponseInterface $response): string
+    {
+        if (!str_contains($response->getHeaderLine('content-type'), 'application/json')) {
+            return '非 json 响应';
+        }
+
+        $body = (string) $response->getBody();
+
+        // 10K
+        if (strlen($body) <= 10 * 1024) {
+            return $body;
+        }
+
+        return '[仅展示前1024个字符]'.substr($body, 0, 1024).'...';
+    }
+
+    protected function metric(string $url, float $elapsed, int $code = 0): void
     {
         $this->eventDispatcher->dispatch(new Metric(new Request([
             'code' => $code,
             'url' => $url,
             'duration' => $elapsed,
-            'extra' => $extra,
         ])));
     }
 }
